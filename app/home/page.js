@@ -1,26 +1,65 @@
 "use client";  // App Router 下需要声明客户端组件
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function RequirementCapturePage() {
   const [description, setDescription] = useState("");
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
-  const handleSubmit = (e) => {
+//   const handleSubmit = (e) => {
+//     e.preventDefault();
+//     if (!description.trim()) return;
+//     setLoading(true);
+
+//     // 模拟提交请求
+//     setTimeout(() => {
+//       console.log("User input:", description);
+//       setLoading(false);
+//       alert(
+//         "已提交：" +
+//           description +
+//           "\n下一步：解析需求并生成简单 UI（Entities 表单、角色菜单等）"
+//       );
+//     }, 600);
+//   };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!description.trim()) return;
     setLoading(true);
+    try {
+      const res = await fetch("/api/extract", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: description }),
+      });
+      const data = await res.json();
+      // 这里你可以把结果展示在页面上（先用 alert 代替）
+    //   alert(
+    //     `App Name: ${data.appName}\n` +
+    //     `Entities: ${data.entities.join(", ")}\n` +
+    //     `Roles: ${data.roles.join(", ")}\n` +
+    //     `Features: ${data.features.join(", ")}`
+    //   );
 
-    // 模拟提交请求
-    setTimeout(() => {
-      console.log("User input:", description);
+      // 将解析结果保存在 localStorage，供下一步页面编辑使用
+      localStorage.setItem("extractedSpec", JSON.stringify({
+        appName: data.appName || "My App",
+        entities: Array.isArray(data.entities) ? data.entities : ["Item"],
+        roles: Array.isArray(data.roles) ? data.roles : ["User"],
+        features: Array.isArray(data.features) ? data.features : ["View dashboard"],
+        sourceText: description.trim(),
+      }));
+
+      router.push("/review");
+    } catch (err) {
+      console.error(err);
+      alert("Extraction failed.");
+    } finally {
       setLoading(false);
-      alert(
-        "已提交：" +
-          description +
-          "\n下一步：解析需求并生成简单 UI（Entities 表单、角色菜单等）"
-      );
-    }, 600);
+    }
   };
 
   return (
@@ -65,9 +104,31 @@ export default function RequirementCapturePage() {
               <button
                 type="submit"
                 disabled={loading || !description.trim()}
-                className="w-full rounded-xl px-4 py-3 font-medium ring-1 ring-white/10 bg-gradient-to-r from-indigo-500 via-sky-500 to-emerald-500 disabled:opacity-60 disabled:cursor-not-allowed hover:brightness-110 transition"
+                className="w-full rounded-xl px-4 py-3 font-medium ring-1 ring-white/10 bg-gradient-to-r from-indigo-500 via-sky-500 to-emerald-500 disabled:opacity-60 disabled:cursor-not-allowed hover:brightness-110 transition flex items-center justify-center gap-2"
                 aria-busy={loading}
               >
+                {loading && (
+                  <svg 
+                    className="animate-spin h-4 w-4 text-white" 
+                    xmlns="http://www.w3.org/2000/svg" 
+                    fill="none" 
+                    viewBox="0 0 24 24"
+                  >
+                    <circle 
+                      className="opacity-25" 
+                      cx="12" 
+                      cy="12" 
+                      r="10" 
+                      stroke="currentColor" 
+                      strokeWidth="4"
+                    />
+                    <path 
+                      className="opacity-75" 
+                      fill="currentColor" 
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    />
+                  </svg>
+                )}
                 {loading ? "提交中…" : "提交"}
               </button>
             </form>

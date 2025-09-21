@@ -1,0 +1,161 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+
+export default function ReviewAndEditPage() {
+  const router = useRouter();
+  const [spec, setSpec] = useState({ appName: "", entities: [], roles: [], features: [], sourceText: "" });
+  const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem("extractedSpec");
+      if (!raw) {
+        router.replace("/home");
+        return;
+      }
+      const parsed = JSON.parse(raw);
+      setSpec({
+        appName: parsed.appName || "My App",
+        entities: Array.isArray(parsed.entities) ? parsed.entities : [],
+        roles: Array.isArray(parsed.roles) ? parsed.roles : [],
+        features: Array.isArray(parsed.features) ? parsed.features : [],
+        sourceText: parsed.sourceText || "",
+      });
+      setLoaded(true);
+    } catch (e) {
+      router.replace("/home");
+    }
+  }, [router]);
+
+  const updateList = (key, idx, value) => {
+    setSpec((s) => {
+      const arr = [...s[key]];
+      arr[idx] = value;
+      return { ...s, [key]: arr };
+    });
+  };
+
+  const addItem = (key) => setSpec((s) => ({ ...s, [key]: [...s[key], ""] }));
+  const removeItem = (key, idx) => setSpec((s) => ({ ...s, [key]: s[key].filter((_, i) => i !== idx) }));
+
+  const goBack = () => router.push("/home");
+
+  // reset spec to extracted
+  const resetToExtracted = () => {
+    const raw = localStorage.getItem("extractedSpec");
+    
+    const parsed = JSON.parse(raw);
+    setSpec({
+        appName: parsed.appName || "My App",
+        entities: Array.isArray(parsed.entities) ? parsed.entities : [],
+        roles: Array.isArray(parsed.roles) ? parsed.roles : [],
+        features: Array.isArray(parsed.features) ? parsed.features : [],
+        sourceText: parsed.sourceText || "",
+    });
+  };
+
+  // submit spec
+  const submit = () => {
+    // 这里先简单展示，下一步将用于生成 UI
+    const normalized = {
+      appName: spec.appName?.trim() || "My App",
+      entities: spec.entities.map((x) => x.trim()).filter(Boolean),
+      roles: spec.roles.map((x) => x.trim()).filter(Boolean),
+      features: spec.features.map((x) => x.trim()).filter(Boolean),
+    };
+    localStorage.setItem("confirmedSpec", JSON.stringify(normalized));
+    alert("已确认，下一步将根据这些内容生成演示 UI。\n" + JSON.stringify(normalized, null, 2));
+    // 你也可以在这里跳转到 /generate 进入第三步
+    // router.push("/generate");
+  };
+
+  if (!loaded) return null;
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-slate-100 flex flex-col">
+      {/* Header */}
+      <header className="container mx-auto px-4 py-6">
+        <div className="flex items-center gap-3">
+          <div className="h-9 w-9 rounded-2xl bg-white/10 backdrop-blur ring-1 ring-white/20 flex items-center justify-center font-semibold">AI</div>
+          <h1 className="text-xl font-semibold tracking-tight">Mini AI App Builder</h1>
+        </div>
+      </header>
+
+      {/* Main */}
+      <main className="container mx-auto px-4 flex-1 max-w-6xl w-full">
+        <div className="relative">
+          <div className="absolute -inset-0.5 bg-gradient-to-r from-indigo-500 via-sky-500 to-emerald-500 rounded-3xl blur opacity-30" />
+          <div className="relative rounded-3xl bg-white/5 ring-1 ring-white/10 backdrop-blur p-8">
+            <h2 className="text-2xl font-bold">Step 2 · 审核与修订</h2>
+            {spec.sourceText && (
+              <p className="mt-2 text-sm text-slate-300">来源：{spec.sourceText}</p>
+            )}
+
+            {/* App Name */}
+            <div className="mt-6">
+              <label className="text-sm text-slate-300">App Name</label>
+              <input
+                className="mt-2 w-full rounded-xl bg-white/10 ring-1 ring-white/10 focus:ring-2 focus:ring-sky-400 px-4 py-3 outline-none placeholder:text-slate-400"
+                placeholder="My App"
+                value={spec.appName}
+                onChange={(e) => setSpec({ ...spec, appName: e.target.value })}
+              />
+            </div>
+
+            {/* Entities / Roles / Features 编辑区 */}
+            <div className="mt-8 grid md:grid-cols-3 gap-6">
+              {(["entities","roles","features"]).map((key) => (
+                <div key={key} className="rounded-2xl bg-white/5 ring-1 ring-white/10 p-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="font-semibold capitalize">{key}</h3>
+                    <button onClick={() => addItem(key)} className="text-xs px-2 py-1 rounded-lg ring-1 ring-white/10 hover:bg-white/10">+ Add</button>
+                  </div>
+                  <div className="space-y-2">
+                    {(spec[key] || []).map((val, idx) => (
+                      <div key={idx} className="flex items-center gap-2">
+                        <input
+                          className="flex-1 rounded-lg bg-white/10 ring-1 ring-white/10 focus:ring-2 focus:ring-sky-400 px-3 py-2 outline-none"
+                          value={val}
+                          onChange={(e) => updateList(key, idx, e.target.value)}
+                          placeholder={key === "features" ? "e.g. Add course" : "e.g. Student"}
+                        />
+                        <button
+                          onClick={() => removeItem(key, idx)}
+                          className="flex-shrink-0 px-3 py-2 rounded-lg ring-1 ring-white/10 hover:bg-white/10 text-sm text-red-300 hover:text-red-200"
+                          aria-label="remove"
+                        >
+                          删除
+                        </button>
+                      </div>
+                    ))}
+                    {(!spec[key] || spec[key].length === 0) && (
+                      <p className="text-xs text-slate-400">暂无条目，点击右上角 + Add 添加。</p>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Actions */}
+            <div className="mt-8 flex flex-col md:flex-row gap-3">
+              <button onClick={goBack} className="md:w-40 w-full rounded-xl px-4 py-3 font-medium ring-1 ring-white/10 bg-white/10 hover:bg-white/15 transition">
+                上一步
+              </button>
+              <button onClick={resetToExtracted} className="md:w-52 w-full rounded-xl px-4 py-3 font-medium ring-1 ring-white/10 bg-white/10 hover:bg-white/15 transition">
+                重置为解析结果
+              </button>
+              <button onClick={submit} className="md:flex-1 w-full rounded-xl px-4 py-3 font-medium ring-1 ring-white/10 bg-gradient-to-r from-indigo-500 via-sky-500 to-emerald-500 hover:brightness-110 transition">
+                提交
+              </button>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      {/* Footer */}
+      <footer className="container mx-auto px-4 py-6 text-xs text-slate-400">© {new Date().getFullYear()} Mini AI App Builder</footer>
+    </div>
+  );
+}
