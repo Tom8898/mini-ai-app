@@ -83,18 +83,18 @@ export default function RequirementCapturePage() {
           <div className="absolute -inset-0.5 bg-gradient-to-r from-indigo-500 via-sky-500 to-emerald-500 rounded-3xl blur opacity-30"></div>
 
           <div className="relative rounded-3xl bg-white/5 ring-1 ring-white/10 backdrop-blur p-8">
-            <h2 className="text-2xl font-bold">Step 1 · 需求捕获</h2>
+            <h2 className="text-2xl font-bold">Step 1 · requirements capture</h2>
             <p className="mt-2 text-sm text-slate-300">
-              用一句话描述你要做的应用（例如：课程管理、库存系统、预订平台等）。
+              Describe your app in one sentence （e.g.：I want develop a website called welcome to China. It help newcomers to China get used to here. It provides some services like how to apply bank card, how to apply traffic card, and job or study guide.）
             </p>
 
             <form onSubmit={handleSubmit} className="mt-6 space-y-4">
               <label className="block">
-                <span className="text-sm text-slate-300">应用描述</span>
+                <span className="text-sm text-slate-300">App Description:</span>
                 <input
                   type="text"
                   className="mt-2 w-full rounded-xl bg-white/10 ring-1 ring-white/10 focus:ring-2 focus:ring-sky-400 px-4 py-3 outline-none placeholder:text-slate-400"
-                  placeholder="例如：老师可以建课，学生选课，管理员出报表"
+                  placeholder=""
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   required
@@ -129,16 +129,16 @@ export default function RequirementCapturePage() {
                     />
                   </svg>
                 )}
-                {loading ? "提交中…" : "提交"}
+                {loading ? "Submitting..." : "Submit"}
               </button>
             </form>
 
             <div className="mt-4 text-xs text-slate-400">
-              目标：后续解析出{" "}
+              Goal: Parse the  
               <span className="font-semibold">
-                App Name / Entities / Roles / Features
+                : App Name / Entities / Roles / Features &nbsp;
               </span>
-              ，并基于它们生成 UI。
+              from the input, then generate the UI from them.
             </div>
           </div>
         </div>

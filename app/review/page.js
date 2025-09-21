@@ -8,6 +8,11 @@ export default function ReviewAndEditPage() {
   const [spec, setSpec] = useState({ appName: "", entities: [], roles: [], features: [], sourceText: "" });
   const [loaded, setLoaded] = useState(false);
 
+  // code from generate page
+  const [code, setCode] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  // init
   useEffect(() => {
     try {
       const raw = localStorage.getItem("extractedSpec");
@@ -29,6 +34,7 @@ export default function ReviewAndEditPage() {
     }
   }, [router]);
 
+  // page operation section begin
   const updateList = (key, idx, value) => {
     setSpec((s) => {
       const arr = [...s[key]];
@@ -55,8 +61,9 @@ export default function ReviewAndEditPage() {
         sourceText: parsed.sourceText || "",
     });
   };
+  // page operation section end
 
-  // submit spec
+  // submit spec to generate code
   const submit = () => {
     // 这里先简单展示，下一步将用于生成 UI
     const normalized = {
@@ -65,13 +72,67 @@ export default function ReviewAndEditPage() {
       roles: spec.roles.map((x) => x.trim()).filter(Boolean),
       features: spec.features.map((x) => x.trim()).filter(Boolean),
     };
-    localStorage.setItem("confirmedSpec", JSON.stringify(normalized));
-    alert("已确认，下一步将根据这些内容生成演示 UI。\n" + JSON.stringify(normalized, null, 2));
+
+    // send request to generate code
+    (async () => {
+      setLoading(true);
+      try {
+        const res = await fetch("/api/generateCode", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(normalized),
+        });
+        const data = await res.json();
+        setCode(data.code || "<!-- empty code -->");
+      } catch (err) {
+        console.error(err);
+        setCode("<!-- generation failed -->");
+      } finally {
+        setLoading(false);
+      }
+    })();
+
+    // localStorage.setItem("confirmedSpec", JSON.stringify(normalized));
+    // alert("已确认，下一步将根据这些内容生成演示 UI。\n" + JSON.stringify(normalized, null, 2));
     // 你也可以在这里跳转到 /generate 进入第三步
-    router.push("/generate");
+    //router.push("/generate");
   };
 
-  if (!loaded) return null;
+  const openPreview = () => {
+    const blob = new Blob([code], { type: "text/html" });
+    const url = URL.createObjectURL(blob);
+    window.open(url, "_blank");
+  };
+
+  if (!loaded) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-slate-100 flex items-center justify-center">
+        <div className="flex items-center gap-3">
+          <svg 
+            className="animate-spin h-6 w-6 text-white" 
+            xmlns="http://www.w3.org/2000/svg" 
+            fill="none" 
+            viewBox="0 0 24 24"
+          >
+            <circle 
+              className="opacity-25" 
+              cx="12" 
+              cy="12" 
+              r="10" 
+              stroke="currentColor" 
+              strokeWidth="4"
+            />
+            <path 
+              className="opacity-75" 
+              fill="currentColor" 
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+            />
+          </svg>
+          <span className="text-lg">加载中...</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-slate-100 flex flex-col">
@@ -88,9 +149,9 @@ export default function ReviewAndEditPage() {
         <div className="relative">
           <div className="absolute -inset-0.5 bg-gradient-to-r from-indigo-500 via-sky-500 to-emerald-500 rounded-3xl blur opacity-30" />
           <div className="relative rounded-3xl bg-white/5 ring-1 ring-white/10 backdrop-blur p-8">
-            <h2 className="text-2xl font-bold">Step 2 · 审核与修订</h2>
+            <h2 className="text-2xl font-bold">Step 2 · Review and Revise</h2>
             {spec.sourceText && (
-              <p className="mt-2 text-sm text-slate-300">来源：{spec.sourceText}</p>
+              <p className="mt-2 text-sm text-slate-300">sourc：{spec.sourceText}</p>
             )}
 
             {/* App Name */}
@@ -126,12 +187,12 @@ export default function ReviewAndEditPage() {
                           className="flex-shrink-0 px-3 py-2 rounded-lg ring-1 ring-white/10 hover:bg-white/10 text-sm text-red-300 hover:text-red-200"
                           aria-label="remove"
                         >
-                          删除
+                          delete
                         </button>
                       </div>
                     ))}
                     {(!spec[key] || spec[key].length === 0) && (
-                      <p className="text-xs text-slate-400">暂无条目，点击右上角 + Add 添加。</p>
+                      <p className="text-xs text-slate-400">No items yet. Click + Add in the top right to add one.</p>
                     )}
                   </div>
                 </div>
@@ -141,16 +202,81 @@ export default function ReviewAndEditPage() {
             {/* Actions */}
             <div className="mt-8 flex flex-col md:flex-row gap-3">
               <button onClick={goBack} className="md:w-40 w-full rounded-xl px-4 py-3 font-medium ring-1 ring-white/10 bg-white/10 hover:bg-white/15 transition">
-                上一步
+                Back
               </button>
               <button onClick={resetToExtracted} className="md:w-52 w-full rounded-xl px-4 py-3 font-medium ring-1 ring-white/10 bg-white/10 hover:bg-white/15 transition">
-                重置为解析结果
+                Reset
               </button>
-              <button onClick={submit} className="md:flex-1 w-full rounded-xl px-4 py-3 font-medium ring-1 ring-white/10 bg-gradient-to-r from-indigo-500 via-sky-500 to-emerald-500 hover:brightness-110 transition">
-                提交
+              <button 
+                onClick={submit} 
+                disabled={loading}
+                className="md:flex-1 w-full rounded-xl px-4 py-3 font-medium ring-1 ring-white/10 bg-gradient-to-r from-indigo-500 via-sky-500 to-emerald-500 hover:brightness-110 transition disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              >
+                {loading && (
+                  <svg 
+                    className="animate-spin h-4 w-4 text-white" 
+                    xmlns="http://www.w3.org/2000/svg" 
+                    fill="none" 
+                    viewBox="0 0 24 24"
+                  >
+                    <circle 
+                      className="opacity-25" 
+                      cx="12" 
+                      cy="12" 
+                      r="10" 
+                      stroke="currentColor" 
+                      strokeWidth="4"
+                    />
+                    <path 
+                      className="opacity-75" 
+                      fill="currentColor" 
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    />
+                  </svg>
+                )}
+                {loading ? "Generating..." : "Submit"}
               </button>
             </div>
           </div>
+
+
+          <div className="relative mt-8">
+          <div className="absolute -inset-0.5 bg-gradient-to-r from-indigo-500 via-sky-500 to-emerald-500 rounded-3xl blur opacity-30" />
+          <div className="relative rounded-3xl bg-white/5 ring-1 ring-white/10 backdrop-blur p-8 space-y-6">
+            
+            {loading && (
+              <div className="text-sm text-slate-300">Generating code based on the confirmed requirements…</div>
+            )}
+
+            {!loading && code && (
+              <>
+                <div>
+                  <h3 className="text-lg font-semibold mb-2">Code generation completed</h3>
+                  <pre className="bg-black/50 rounded-xl p-4 overflow-x-auto text-sm whitespace-pre-wrap">
+                    <code>{code}</code>
+                  </pre>
+                </div>
+                <button
+                  onClick={openPreview}
+                  className="rounded-xl px-4 py-3 font-medium ring-1 ring-white/10 bg-white/10 hover:bg-white/15 transition"
+                >
+                  Preview in new tab
+                </button>
+              </>
+            )}
+
+            {!loading && !code && (
+              <div className="text-sm text-slate-400">No code available for now</div>
+            )}
+          </div>
+        </div>
+
+
+
+
+
+
+
         </div>
       </main>
 
