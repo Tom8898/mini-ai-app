@@ -68,7 +68,7 @@ export default function ReviewAndEditPage() {
     localStorage.setItem("confirmedSpec", JSON.stringify(normalized));
     alert("已确认，下一步将根据这些内容生成演示 UI。\n" + JSON.stringify(normalized, null, 2));
     // 你也可以在这里跳转到 /generate 进入第三步
-    // router.push("/generate");
+    router.push("/generate");
   };
 
   if (!loaded) return null;
