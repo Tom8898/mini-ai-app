@@ -104,6 +104,25 @@ export default function ReviewAndEditPage() {
     window.open(url, "_blank");
   };
 
+  // clip board
+  const copyToClipboard = async () => {
+    try {
+      await navigator.clipboard.writeText(code);
+      // 可以添加一个简单的提示，比如改变按钮文字
+      alert("Code copied to clipboard!");
+    } catch (err) {
+      console.error("Failed to copy: ", err);
+      // 降级方案：使用传统的复制方法
+      const textArea = document.createElement("textarea");
+      textArea.value = code;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand("copy");
+      document.body.removeChild(textArea);
+      alert("Code copied to clipboard!");
+    }
+  };
+
   if (!loaded) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-slate-100 flex items-center justify-center">
@@ -250,18 +269,27 @@ export default function ReviewAndEditPage() {
 
             {!loading && code && (
               <>
-                <div>
-                  <h3 className="text-lg font-semibold mb-2">Code generation completed</h3>
-                  <pre className="bg-black/50 rounded-xl p-4 overflow-x-auto text-sm whitespace-pre-wrap">
-                    <code>{code}</code>
-                  </pre>
-                </div>
-                <button
-                  onClick={openPreview}
-                  className="rounded-xl px-4 py-3 font-medium ring-1 ring-white/10 bg-white/10 hover:bg-white/15 transition"
-                >
-                  Preview in new tab
-                </button>
+                  <div>
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="text-lg font-semibold">Code generation completed</h3>
+                      <button
+                        onClick={openPreview}
+                        className="rounded-xl px-4 py-3 font-medium ring-1 ring-white/10 bg-white/10 hover:bg-white/15 transition"
+                      >
+                        Preview
+                      </button>
+                       <button
+                         onClick={copyToClipboard}
+                         className="rounded-xl px-4 py-3 font-medium ring-1 ring-white/10 bg-white/10 hover:bg-white/15 transition"
+                       >
+                         Copy
+                       </button>
+                    </div>
+                    <pre className="bg-black/50 rounded-xl p-4 overflow-x-auto text-sm whitespace-pre-wrap">
+                      <code>{code}</code>
+                    </pre>
+                  </div>
+                
               </>
             )}
 
