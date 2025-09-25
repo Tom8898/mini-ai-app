@@ -1,9 +1,10 @@
 import OpenAI from "openai";
 import { NextResponse } from "next/server";
+import {withAuthAPI} from "@/lib/withAuthAPI";
 
 const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-export async function POST(req) {
+async function extract(req) {
   try {
     const { text } = await req.json();
 
@@ -85,3 +86,5 @@ User input:
     });
   }
 }
+
+export const POST = withAuthAPI(extract);
