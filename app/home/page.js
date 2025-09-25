@@ -27,6 +27,7 @@ export default function RequirementCapturePage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
     if (!description.trim()) return;
     setLoading(true);
     try {
@@ -36,13 +37,6 @@ export default function RequirementCapturePage() {
         body: JSON.stringify({ text: description }),
       });
       const data = await res.json();
-      // 这里你可以把结果展示在页面上（先用 alert 代替）
-    //   alert(
-    //     `App Name: ${data.appName}\n` +
-    //     `Entities: ${data.entities.join(", ")}\n` +
-    //     `Roles: ${data.roles.join(", ")}\n` +
-    //     `Features: ${data.features.join(", ")}`
-    //   );
 
       // 将解析结果保存在 localStorage，供下一步页面编辑使用
       localStorage.setItem("extractedSpec", JSON.stringify({

@@ -15,19 +15,36 @@ export default function LoginPage() {
     setPassword("");
   };
 
+  // submit
   const handleLogin = async (e) => {
     e.preventDefault();
+
     if (!username.trim() || !password) return;
+
     setLoading(true);
+
     try {
-      // TODO: 集成真实鉴权逻辑（/api/login）。当前仅做示例。
-      await new Promise((r) => setTimeout(r, 500));
-      alert(`Welcome, ${username}! (demo)`);
-      // 可选：登录后跳转到首页或需求页
-      // router.push("/requirement");
+      // request api/login
+      const res = await fetch("/api/login",
+        {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({username: username, password: password})
+        }
+      );
+
+      // handle return result
+      const body = await res.json();
+      
+      if (res.status !== 200) {
+        throw new Error(body.error);
+      }
+
+      // go to /home
+      router.push("/home");
     } catch (err) {
       console.error(err);
-      alert("Login failed (demo)");
+      alert(err.message);
     } finally {
       setLoading(false);
     }
