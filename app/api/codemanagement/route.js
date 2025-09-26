@@ -1,6 +1,8 @@
 import clientPromise from "@/lib/mongodb";
 import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
 
+// query code
 export async function GET() {
   try {
     const client = await clientPromise;
@@ -17,14 +19,23 @@ export async function GET() {
   }
 }
 
+// save code
 export async function POST(req) {
     try {
       const body = await req.json();
       const client = await clientPromise;
       const db = client.db(process.env.MONGODB_DB);
       const collection = db.collection("ai_code");
+
+      // user info
+      const cookieStore = await cookies();
+      const userId = cookieStore.get("sid")?.value;
+      const userName = cookieStore.get("sname")?.value;
+      // const username = 
   
       const doc = {
+        user_id: userId,
+        user_name: userName,
         ...body,
         createdAt: new Date(),
       };
@@ -32,7 +43,7 @@ export async function POST(req) {
       const result = await collection.insertOne(doc);
       return NextResponse.json({ ok: true, id: result.insertedId });
     } catch (err) {
-      console.error("saveSpec error:", err);
-      return NextResponse.json({ ok: false, error: "Failed to save" }, { status: 500 });
+      console.error("save code error:", err);
+      return NextResponse.json({ ok: false, message: "Failed to save code" }, { status: 500 });
     }
   }

@@ -30,7 +30,14 @@ export async function POST(req) {
       // 3. return
       const isProd = process.env.NODE_ENV === "production";
       const res = NextResponse.json(doc);
-      res.cookies.set("sid", doc._id, {
+      res.cookies.set("sid", doc._id, { // userid
+        httpOnly: false,   // 
+        secure: isProd,     // 
+        sameSite: "lax",  // 
+        path: "/",
+      });
+      
+      res.cookies.set("sname", doc.name, { // username
         httpOnly: false,   // 
         secure: isProd,     // 
         sameSite: "lax",  // 

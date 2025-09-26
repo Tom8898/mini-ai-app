@@ -8,23 +8,6 @@ export default function RequirementCapturePage() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-//   const handleSubmit = (e) => {
-//     e.preventDefault();
-//     if (!description.trim()) return;
-//     setLoading(true);
-
-//     // 模拟提交请求
-//     setTimeout(() => {
-//       console.log("User input:", description);
-//       setLoading(false);
-//       alert(
-//         "已提交：" +
-//           description +
-//           "\n下一步：解析需求并生成简单 UI（Entities 表单、角色菜单等）"
-//       );
-//     }, 600);
-//   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     
