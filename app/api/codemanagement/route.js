@@ -3,18 +3,29 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 
 // query code
-export async function GET() {
+export async function GET(req) {
   try {
     const client = await clientPromise;
     const db = client.db(process.env.MONGODB_DB); //  .env.local 
     const collection = db.collection("ai_code");
 
-    // query
-    const docs = await collection.find({}).limit(10).toArray();
+    const { searchParams } = new URL(req.url);
+    const username = searchParams.get("username")?.trim();
+    const appname = searchParams.get("appname")?.trim();
+
+    const filter = {};
+    if (username) filter.user_name = username;
+    if (appname) filter.app_name = appname;
+
+    const docs = await collection
+      .find(filter)
+      .sort({ createdAt: -1 })
+      .limit(100)
+      .toArray();
 
     return NextResponse.json(docs);
   } catch (err) {
-    console.error("getSpecs error:", err);
+    console.error("get history error:", err);
     return NextResponse.json({ error: "Failed to fetch" }, { status: 500 });
   }
 }

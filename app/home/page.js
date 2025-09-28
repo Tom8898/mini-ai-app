@@ -1,6 +1,7 @@
 "use client";  // App Router 下需要声明客户端组件
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 export default function RequirementCapturePage() {
@@ -50,12 +51,23 @@ export default function RequirementCapturePage() {
           <h1 className="text-xl font-semibold tracking-tight">
             Mini AI App Builder
           </h1>
+
+
+          <div className="ml-auto">
+            <Link href="/history" className="text-sm px-3 py-1 rounded-lg ring-1 ring-white/10 hover:bg-white/10">
+              History
+            </Link>
+          </div>
+
+
+          
         </div>
       </header>
 
       {/* Main */}
       <main className="container mx-auto px-4 flex-1 grid place-items-center">
         <div className="relative w-full max-w-2xl">
+
           {/* Glow border */}
           <div className="absolute -inset-0.5 bg-gradient-to-r from-indigo-500 via-sky-500 to-emerald-500 rounded-3xl blur opacity-30"></div>
 
