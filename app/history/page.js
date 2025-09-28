@@ -93,6 +93,7 @@ export default function HistoryPage() {
                                     <th className="py-2 pr-4">Roles</th>
                                     <th className="py-2 pr-4">Entities</th>
                                     <th className="py-2 pr-4">Features</th>
+                                    <th className="py-2 pr-4">Created At</th>
                                     <th className="py-2 pr-4">Code</th>
                                 </tr>
                             </thead>
@@ -109,6 +110,7 @@ export default function HistoryPage() {
                                             <td className="py-2 pr-4 whitespace-pre-wrap">{Array.isArray(it.roles) ? it.roles.join(", ") : String(it.roles ?? "-")}</td>
                                             <td className="py-2 pr-4 whitespace-pre-wrap">{Array.isArray(it.entities) ? it.entities.join(", ") : String(it.entities ?? "-")}</td>
                                             <td className="py-2 pr-4 whitespace-pre-wrap">{Array.isArray(it.features) ? it.features.join(", ") : String(it.features ?? "-")}</td>
+                                            <td className="py-2 pr-4 whitespace-nowrap">{it.createdAt ? new Date(it.createdAt).toLocaleString() : "-"}</td>
                                             <td className="py-2 pr-4 max-w-[360px] whitespace-pre-wrap break-words">
                                                 <div className="space-y-2">
                                                     <div>

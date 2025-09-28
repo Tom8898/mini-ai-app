@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import LoadingSpinner from "@/components/LoadingSpinner";
 
 export default function ReviewAndEditPage() {
@@ -200,6 +201,9 @@ export default function ReviewAndEditPage() {
         <div className="flex items-center gap-3">
           <div className="h-9 w-9 rounded-2xl bg-white/10 backdrop-blur ring-1 ring-white/20 flex items-center justify-center font-semibold">AI</div>
           <h1 className="text-xl font-semibold tracking-tight">Mini AI App Builder</h1>
+          <div className="ml-auto">
+            <Link href="/home" className="text-sm px-3 py-1 rounded-lg ring-1 ring-white/10 hover:bg-white/10">Home</Link>
+          </div>
         </div>
       </header>
 
