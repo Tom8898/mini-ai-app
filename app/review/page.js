@@ -214,7 +214,7 @@ export default function ReviewAndEditPage() {
           <div className="relative rounded-3xl bg-white/5 ring-1 ring-white/10 backdrop-blur p-8">
             <h2 className="text-2xl font-bold">Step 2 · Review and Revise</h2>
             {spec.sourceText && (
-              <p className="mt-2 text-sm text-slate-300">sourc：{spec.sourceText}</p>
+              <p className="mt-2 text-sm text-slate-300">resource：{spec.sourceText}</p>
             )}
 
             {/* App Name */}
@@ -293,8 +293,10 @@ export default function ReviewAndEditPage() {
               {!loading && code && (
                 <>
                   <div>
-                    <div className="flex items-center justify-between mb-4">
+                    <div className="mb-3">
                       <h3 className="text-lg font-semibold">Code generation completed</h3>
+                    </div>
+                    <div className="flex items-center gap-2 mb-4">
                       <button
                         onClick={openPreview}
                         className="rounded-xl px-4 py-3 font-medium ring-1 ring-white/10 bg-white/10 hover:bg-white/15 transition"
@@ -315,12 +317,13 @@ export default function ReviewAndEditPage() {
                         {saveCodeLoaded && <LoadingSpinner size="sm" color="white" />}
                         {saveCodeLoaded ? "Saving..." : saveSuccess ? "Save Success" : "Save"}
                       </button>
-
-
                     </div>
-                    <pre className="bg-black/50 rounded-xl p-4 overflow-x-auto text-sm whitespace-pre-wrap">
-                      <code>{code}</code>
-                    </pre>
+                    <textarea
+                      value={code}
+                      onChange={(e) => setCode(e.target.value)}
+                      className="w-full min-h-[480px] bg-black/50 rounded-xl p-4 text-sm font-mono outline-none ring-1 ring-white/10 focus:ring-2 focus:ring-sky-400 whitespace-pre resize-y"
+                      spellCheck={false}
+                    />
                   </div>
 
                 </>

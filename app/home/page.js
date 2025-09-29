@@ -9,6 +9,14 @@ export default function RequirementCapturePage() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
+  const logout = async () => {
+    try {
+      await fetch("/api/logout", { method: "POST" });
+    } finally {
+      router.push("/login");
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -53,10 +61,13 @@ export default function RequirementCapturePage() {
           </h1>
 
 
-          <div className="ml-auto">
+          <div className="ml-auto flex items-center gap-2">
             <Link href="/history" className="text-sm px-3 py-1 rounded-lg ring-1 ring-white/10 hover:bg-white/10">
               History
             </Link>
+            <button onClick={logout} className="text-sm px-3 py-1 rounded-lg ring-1 ring-white/10 hover:bg-white/10">
+              Logout
+            </button>
           </div>
 
 
@@ -74,15 +85,15 @@ export default function RequirementCapturePage() {
           <div className="relative rounded-3xl bg-white/5 ring-1 ring-white/10 backdrop-blur p-8">
             <h2 className="text-2xl font-bold">Step 1 · requirements capture</h2>
             <p className="mt-2 text-sm text-slate-300">
-              Describe your app in one sentence （e.g.：I want develop a website called welcome to China. It help newcomers to China get used to here. It provides some services like how to apply bank card, how to apply traffic card, and job or study guide.）
+              Describe your app in one sentence （e.g.：I want develop a website called welcome to New Zealand. It help newcomers to New Zealand get used to here. It provides some services like how to apply bank card, how to apply traffic card, and job or study guide.）
             </p>
 
             <form onSubmit={handleSubmit} className="mt-6 space-y-4">
               <label className="block">
                 <span className="text-sm text-slate-300">App Description:</span>
-                <input
-                  type="text"
-                  className="mt-2 w-full rounded-xl bg-white/10 ring-1 ring-white/10 focus:ring-2 focus:ring-sky-400 px-4 py-3 outline-none placeholder:text-slate-400"
+                <textarea
+                  rows={5}
+                  className="mt-2 w-full min-h-32 rounded-xl bg-white/10 ring-1 ring-white/10 focus:ring-2 focus:ring-sky-400 px-4 py-3 outline-none placeholder:text-slate-400 resize-y"
                   placeholder=""
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
