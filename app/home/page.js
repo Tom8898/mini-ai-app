@@ -85,7 +85,8 @@ export default function RequirementCapturePage() {
           <div className="relative rounded-3xl bg-white/5 ring-1 ring-white/10 backdrop-blur p-8">
             <h2 className="text-2xl font-bold">Step 1 · requirements capture</h2>
             <p className="mt-2 text-sm text-slate-300">
-              Describe your app in one sentence （e.g.：I want develop a website called welcome to New Zealand. It help newcomers to New Zealand get used to here. It provides some services like how to apply bank card, how to apply traffic card, and job or study guide.）
+              Describe your app in one sentence （e.g.：I want an app to manage student courses and grades. Teachers add courses, students enrol,
+              and admins manage reports.）
             </p>
 
             <form onSubmit={handleSubmit} className="mt-6 space-y-4">
