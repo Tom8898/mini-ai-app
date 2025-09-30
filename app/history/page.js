@@ -28,6 +28,16 @@ export default function HistoryPage() {
         }
     };
 
+  const previewViewerHtml = () => {
+    try {
+      const blob = new Blob([viewerCode || ""], { type: "text/html;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      window.open(url, "_blank");
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
     const fetchData = async () => {
         setLoading(true);
         try {
@@ -147,7 +157,7 @@ export default function HistoryPage() {
                 <div className="fixed inset-0 z-50 flex items-center justify-center">
                     <div className="absolute inset-0 bg-black/60" onClick={() => setViewerOpen(false)} />
                     <div className="relative z-10 w-[90vw] max-w-5xl h-[80vh] rounded-2xl bg-slate-900 ring-1 ring-white/10 p-4 flex flex-col">
-                        <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center justify-between mb-3">
                             <h3 className="text-lg font-semibold">Code</h3>
                             <div className="flex gap-2">
                                 <button
@@ -156,6 +166,12 @@ export default function HistoryPage() {
                                 >
                                     Copy
                                 </button>
+                  <button
+                    onClick={previewViewerHtml}
+                    className="text-xs px-2 py-1 rounded-lg ring-1 ring-white/10 hover:bg-white/10"
+                  >
+                    Preview
+                  </button>
                                 <button
                                     onClick={() => setViewerOpen(false)}
                                     className="text-xs px-2 py-1 rounded-lg ring-1 ring-white/10 hover:bg-white/10"
