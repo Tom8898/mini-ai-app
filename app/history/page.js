@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { stripCodeFence } from "@/lib/stripCodeFence";
 
 export default function HistoryPage() {
     const [username, setUsername] = useState("");
@@ -12,7 +13,7 @@ export default function HistoryPage() {
     const [viewerCode, setViewerCode] = useState("");
 
     const openViewer = (code) => {
-        const full = typeof code === "string" ? code : JSON.stringify(code ?? "", null, 2);
+        const full = typeof code === "string" ? stripCodeFence(code) : JSON.stringify(code ?? "", null, 2);
         setViewerCode(full);
         setViewerOpen(true);
     };

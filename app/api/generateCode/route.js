@@ -1,5 +1,6 @@
 import OpenAI from "openai";
 import { NextResponse } from "next/server";
+import { stripCodeFence } from "@/lib/stripCodeFence";
 
 const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
@@ -32,7 +33,7 @@ Rules:
       temperature: 0.2,
     });
 
-    const code = completion.choices?.[0]?.message?.content ?? "";
+    const code = stripCodeFence(completion.choices?.[0]?.message?.content ?? "");
 
     // return
     return NextResponse.json({ code });

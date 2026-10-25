@@ -1,6 +1,6 @@
 import OpenAI from "openai";
 import { NextResponse } from "next/server";
-import {withAuthAPI} from "@/lib/withAuthAPI";
+import { withAuthAPI } from "@/lib/withAuthAPI";
 
 const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
